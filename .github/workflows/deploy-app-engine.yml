@@ -11,7 +11,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: coc105-cicd-lab
+        working-directory: COC105-CICD-LAB/coc105-cicd-lab
 
     steps:
       - name: Checkout code
