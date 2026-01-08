@@ -9,20 +9,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: COC105-CICD-LAB/coc105-cicd-lab
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Debug - show workspace files
+      - name: Debug - show repo structure
         run: |
           pwd
           ls -la
-          find . -maxdepth 3 -type f -name "app.yaml" -o -name "requirements.txt" -o -name "main.py"
-          
+          find . -maxdepth 4 -type f -name "app.yaml" -o -name "requirements.txt" -o -name "main.py" -o -name "test_app.py"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -30,26 +26,16 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd coc105-cicd-lab
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          else
+            cd coc105-cicd-lab && pip install -r requirements.txt
+          fi
 
       - name: Run unit tests
         run: |
-          cd coc105-cicd-lab
-          python -m pytest tests
-
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GAE_SA_KEY }}
-
-      - name: Set up gcloud
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-
-      - name: Deploy to App Engine
-        run: |
-          cd coc105-cicd-lab
-          gcloud app deploy app.yaml --quiet
+          if [ -d tests ]; then
+            python -m pytest tests
+          else
+            cd coc105-cicd-lab && python -m pytest tests
+          fi
