@@ -17,6 +17,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Debug - show workspace files
+        run: |
+          pwd
+          ls -la
+          find . -maxdepth 3 -type f -name "app.yaml" -o -name "requirements.txt" -o -name "main.py"
+          
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -24,11 +30,13 @@ jobs:
 
       - name: Install dependencies
         run: |
+          cd coc105-cicd-lab
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Run unit tests
         run: |
+          cd coc105-cicd-lab
           python -m pytest tests
 
       - name: Authenticate to Google Cloud
@@ -43,4 +51,5 @@ jobs:
 
       - name: Deploy to App Engine
         run: |
+          cd coc105-cicd-lab
           gcloud app deploy app.yaml --quiet
